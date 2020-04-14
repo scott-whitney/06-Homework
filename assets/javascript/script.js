@@ -1,6 +1,5 @@
 $(document).ready(function(){
-    var lat = 0
-    var lon = 0
+    const API_KEY = '74cc06d1f9746e036575a255fb4c34fc';
     var searchCity = '';
     $('#userBtn').on('click', appendCity);
     const d = new Date();
@@ -26,7 +25,7 @@ $(document).ready(function(){
 
 
     function cityWeather(clicked) {
-        const API_KEY = '74cc06d1f9746e036575a255fb4c34fc';
+        // const API_KEY = '74cc06d1f9746e036575a255fb4c34fc';
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${clicked},Unitedstates&appid=${API_KEY}&units=imperial`;
     
         $.ajax({
@@ -34,34 +33,26 @@ $(document).ready(function(){
           method: 'GET'
         }).then(response => {
 
+
+            weatherImg = response.weather[0].icon
+            let lat = response.coord.lat
+            let lon = response.coord.lon
+
+        $('#cloudy').attr('src', "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png")
           $('#currentCity').text(searchCity);
           $('#currentTemp').text(`Temp: ${response.main.temp}`);
           $('#currentHumidity').text(`Humidity: ${response.main.humidity}`);
           $('#currentWind').text(`Wind Speed: ${response.wind.speed}`);
      
-    
-    
+            uVIndex(lat, lon)
+        //   cityForecast(clicked);
         });
 
     }
-    function newForecast(clicked) {
-        const API_KEY = '2ce355258826ac3c5b0c467e43a3dcbf'
-        const url = `https:api.openweathermap.org/data/2.5/weather?q=${clicked}&appid=${API_KEY}`
-        $.ajax({
-            url,
-            method:'GET'
-        }).then(response => {
-            console.log(response)
-            console.log(response.coord.lon)
-            console.log(response.coord.lat)
-            lat = response.coord.lat
-            lon = response.coord.lon
-           
-        })
-    }
-    function uVIndex() {
-        const API_KEY = '2ce355258826ac3c5b0c467e43a3dcbf'
-        const urlot = `http://api.openweathermap.org/data/2.5/uvi?appid=${API_KEY}&lat=${lat}&lon=${lon}`
+
+    function uVIndex(lat, lon) {
+        let API_KEYs = '2ce355258826ac3c5b0c467e43a3dcbf'
+        const urlot = `https://api.openweathermap.org/data/2.5/uvi?appid=${API_KEYs}&lat=${lat}&lon=${lon}`;
         $.ajax({
             urlot,
             method:"GET"
@@ -72,7 +63,7 @@ $(document).ready(function(){
     function cityForecast(clicked) {
 
         const fiveDays = 5;
-        const API_KEY = '74cc06d1f9746e036575a255fb4c34fc';
+        // const API_KEY = '74cc06d1f9746e036575a255fb4c34fc';
         const url = `https://api.openweathermap.org/data/2.5/forecast/daily?q=${clicked}&cnt=${fiveDays}&appid=${API_KEY}&units=imperial`
 
         $.ajax({
@@ -118,8 +109,17 @@ $(document).ready(function(){
             let output4 =
             (mm4<10 ? '0' : '') + mm4 + '/' +
             (dd4<10 ? '0' : '') + dd4 + '/' + yyyy4
-        
- 
+            console.log(response)
+            console.log(response.list[0].weather[0].icon)
+            console.log(response.list[1].weather[0].icon)
+            console.log(response.list[2].weather[0].icon)
+            console.log(response.list[3].weather[0].icon)
+            console.log(response.list[4].weather[0].icon)
+            $('#icon0').attr('src', "https://openweathermap.org/img/w/" + response.list[0].weather[0].icon + ".png")
+            $('#icon1').attr('src', "https://openweathermap.org/img/w/" + response.list[1].weather[0].icon + ".png")
+            $('#icon2').attr('src', "https://openweathermap.org/img/w/" + response.list[2].weather[0].icon + ".png")
+            $('#icon3').attr('src', "https://openweathermap.org/img/w/" + response.list[3].weather[0].icon + ".png")
+            $('#icon4').attr('src', "https://openweathermap.org/img/w/" + response.list[4].weather[0].icon + ".png")
             $('#temp0').text("Temp:" + response.list[0].temp.day)
             $('#temp1').text("Temp:" + response.list[1].temp.day)
             $('#temp2').text("Temp:" + response.list[2].temp.day)
@@ -147,7 +147,7 @@ $(document).ready(function(){
                     $(`#day${i}`).attr('class', 'bg-primary')
                 }
             }
-
+            // newForecast(clicked)
         })
     }
 
@@ -175,17 +175,15 @@ $(document).ready(function(){
         cityForecast(searchCity);
         reveal();
     }
-    async function onClick(arr){
-           try{ 
+ function onClick(arr){
+           
             console.log(arr);
-            await cityWeather(arr);
-            await cityForecast(arr);
-            await newForecast(arr)
-            await uVIndex();
+             cityWeather(arr);
+             cityForecast(arr);
+            //  newForecast(arr)
+            //  uVIndex();
             reveal();
-           } catch(err) {
-               console.log(err)
-           }
+
 
     }
 
