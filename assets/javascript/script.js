@@ -1,4 +1,6 @@
 $(document).ready(function(){
+    var lat = 0
+    var lon = 0
     var searchCity = '';
     $('#userBtn').on('click', appendCity);
     const d = new Date();
@@ -33,14 +35,39 @@ $(document).ready(function(){
         }).then(response => {
 
           $('#currentCity').text(searchCity);
-          $('#currentTemp').text(response.main.temp);
-          $('#currentHumidity').text(response.main.humidity);
-          $('#currentWind').text(response.wind.speed);
+          $('#currentTemp').text(`Temp: ${response.main.temp}`);
+          $('#currentHumidity').text(`Humidity: ${response.main.humidity}`);
+          $('#currentWind').text(`Wind Speed: ${response.wind.speed}`);
      
     
     
         });
 
+    }
+    function newForecast(clicked) {
+        const API_KEY = '2ce355258826ac3c5b0c467e43a3dcbf'
+        const url = `https:api.openweathermap.org/data/2.5/weather?q=${clicked}&appid=${API_KEY}`
+        $.ajax({
+            url,
+            method:'GET'
+        }).then(response => {
+            console.log(response)
+            console.log(response.coord.lon)
+            console.log(response.coord.lat)
+            lat = response.coord.lat
+            lon = response.coord.lon
+           
+        })
+    }
+    function uVIndex() {
+        const API_KEY = '2ce355258826ac3c5b0c467e43a3dcbf'
+        const urlot = `http://api.openweathermap.org/data/2.5/uvi?appid=${API_KEY}&lat=${lat}&lon=${lon}`
+        $.ajax({
+            urlot,
+            method:"GET"
+        }).then(response => {
+            console.log(response)
+        })
     }
     function cityForecast(clicked) {
 
@@ -91,7 +118,7 @@ $(document).ready(function(){
             let output4 =
             (mm4<10 ? '0' : '') + mm4 + '/' +
             (dd4<10 ? '0' : '') + dd4 + '/' + yyyy4
-            console.log(response);
+        
  
             $('#temp0').text("Temp:" + response.list[0].temp.day)
             $('#temp1').text("Temp:" + response.list[1].temp.day)
@@ -148,13 +175,17 @@ $(document).ready(function(){
         cityForecast(searchCity);
         reveal();
     }
-    function onClick(arr){
-            
+    async function onClick(arr){
+           try{ 
             console.log(arr);
-            cityWeather(arr);
-            cityForecast(arr);
+            await cityWeather(arr);
+            await cityForecast(arr);
+            await newForecast(arr)
+            await uVIndex();
             reveal();
-        
+           } catch(err) {
+               console.log(err)
+           }
 
     }
 
@@ -165,6 +196,7 @@ $(document).ready(function(){
     }
     if(pulledSearches) {
         for(i=0; i<pulledSearches.length; i++){
+            onClick(pulledSearches[i])
             console.log(pulledSearches[i])
             var newBtn = $('<button>').attr('value', `${pulledSearches[i]}`).attr('class', 'btn btn-primary').text(pulledSearches[i])
             $('#savedCities').prepend(newBtn)
